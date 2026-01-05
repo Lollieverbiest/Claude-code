@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decision Lean - Interactive Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f2f2f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .phone {
+            width: 390px;
+            height: 844px;
+            background: white;
+            border-radius: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 60px 24px 24px 24px;
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        h1 {
+            font-size: 34px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: #666;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .tagline {
+            font-size: 15px;
+            color: #888;
+            font-style: italic;
+            margin-top: 12px;
+        }
+
+        .disclaimer {
+            background: #e5e5ea;
+            padding: 16px;
+            border-radius: 12px;
+            margin: 32px 0;
+        }
+
+        .disclaimer-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .disclaimer-text {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .section-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin: 16px 0;
+        }
+
+        .category-card {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .category-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .category-icon {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .category-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .category-desc {
+            font-size: 15px;
+            color: #666;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #e5e5ea;
+            border-radius: 2px;
+            margin-bottom: 32px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #000;
+            transition: width 0.3s;
+        }
+
+        .question-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 16px;
+        }
+
+        .question-text {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 32px;
+            line-height: 1.3;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            background: white;
+            border-radius: 12px;
+            font-size: 17px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+        }
+
+        .option-btn {
+            width: 100%;
+            padding: 16px;
+            background: #f2f2f7;
+            border: none;
+            border-radius: 12px;
+            text-align: left;
+            font-size: 17px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            background: #e5e5ea;
+        }
+
+        .option-btn.selected {
+            background: #000;
+            color: white;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary {
+            background: #000;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f2f2f7;
+            color: #000;
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .reflection-block {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+
+        .reflection-block.highlight {
+            background: rgba(0,0,0,0.05);
+            border: 2px solid rgba(0,0,0,0.2);
+        }
+
+        .block-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .block-content {
+            font-size: 17px;
+            line-height: 1.5;
+        }
+
+        .lean-direction {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 12px 0;
+        }
+
+        .confidence-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 17px;
+        }
+
+        .confidence-icon {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <!-- Home Screen -->
+        <div class="screen active" id="home">
+            <h1>Decision Lean</h1>
+            <p class="subtitle">Make fewer wrong decisions — without guilt or rules.</p>
+            <p class="tagline">The goal isn't perfect rationality — just fewer wrong decisions.</p>
+
+            <div class="disclaimer">
+                <div class="disclaimer-title">
+                    <span>ℹ️</span> IMPORTANT
+                </div>
+                <div class="disclaimer-text">
+                    This app does not provide financial, medical, legal, or safety advice. It supports personal reflection only. All decisions remain your own.
+                </div>
+            </div>
+
+            <p class="section-title">What kind of decision are you considering?</p>
+
+            <div class="category-card" onclick="startFlow('purchases')">
+                <div class="category-icon">🛒</div>
+                <div class="category-title">Purchases</div>
+                <div class="category-desc">Consumer goods, subscriptions, gadgets</div>
+            </div>
+
+            <div class="category-card" onclick="startFlow('investments')">
+                <div class="category-icon">📈</div>
+                <div class="category-title">Investments</div>
+                <div class="category-desc">Financial decisions</div>
+            </div>
+
+            <div class="category-card" onclick="startFlow('time')">
+                <div class="category-icon">⏰</div>
+                <div class="category-title">Time & Energy</div>
+                <div class="category-desc">Commitments and obligations</div>
+            </div>
+
+            <div class="category-card" onclick="startFlow('experiences')">
+                <div class="category-icon">✨</div>
+                <div class="category-title">Experiences</div>
+                <div class="category-desc">Travel, events, adventures</div>
+            </div>
+        </div>
+
+        <!-- Question Screen -->
+        <div class="screen" id="questions">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress" style="width: 20%"></div>
+            </div>
+
+            <div class="question-label">QUESTION <span id="q-num">1</span> OF 5</div>
+            <div class="question-text" id="q-text">What are you considering buying?</div>
+
+            <div id="answer-area">
+                <input type="text" id="text-input" placeholder="e.g., noise-canceling headphones">
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="goBack()">Cancel</button>
+                <button class="btn btn-primary" onclick="nextQuestion()">Continue</button>
+            </div>
+        </div>
+
+        <!-- Reflection Screen -->
+        <div class="screen" id="reflection">
+            <h1>Your Decision Lean</h1>
+            <p class="subtitle">Here's what stood out from your answers</p>
+
+            <div style="margin-top: 32px;">
+                <div class="reflection-block">
+                    <div class="block-title">SUMMARY</div>
+                    <div class="block-content">
+                        You're considering designer sneakers, mainly driven by timing and current availability.
+                    </div>
+                </div>
+
+                <div class="reflection-block">
+                    <div class="block-title">⚠️ DOMINANT FRICTION</div>
+                    <div class="block-content">
+                        Short-term urgency appears stronger than long-term value.
+                    </div>
+                </div>
+
+                <div class="reflection-block highlight">
+                    <div class="block-title">➡️ DECISION LEAN</div>
+                    <div class="block-content" style="color: #666; font-size: 15px; margin-bottom: 8px;">
+                        This decision currently leans toward:
+                    </div>
+                    <div class="lean-direction">Lean toward waiting</div>
+                    <div class="block-content">
+                        Your own signals suggest low future value and minimal loss if you pass.
+                    </div>
+                </div>
+
+                <div class="reflection-block">
+                    <div class="block-title">CONFIDENCE</div>
+                    <div class="confidence-badge">
+                        <span class="confidence-icon" style="color: #34c759;">📊</span>
+                        <span>High confidence — internally consistent</span>
+                    </div>
+                </div>
+
+                <div class="reflection-block highlight">
+                    <div class="block-title">NEXT STEP</div>
+                    <div class="block-content">
+                        The option is still there. Seeing how you feel about it tomorrow can be clarifying.
+                    </div>
+                </div>
+
+                <div class="disclaimer">
+                    <div class="disclaimer-title">DISCLAIMER</div>
+                    <div class="disclaimer-text">
+                        This reflection is not financial advice. This app supports personal reflection only. All decisions remain your own.
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" style="width: 100%; margin-top: 16px;" onclick="goHome()">
+                    Reflect on Another Decision
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 1;
+        let currentCategory = 'purchases';
+
+        const questions = {
+            purchases: [
+                {
+                    text: "What are you considering buying?",
+                    type: "text",
+                    placeholder: "e.g., noise-canceling headphones"
+                },
+                {
+                    text: "Why does this feel like the right moment?",
+                    type: "options",
+                    options: [
+                        "I've been thinking about it for a while",
+                        "It's on sale or feels limited",
+                        "I'm reacting to how I feel right now",
+                        "I don't really know"
+                    ]
+                },
+                {
+                    text: "If you buy this, what are you not choosing?",
+                    type: "options",
+                    options: [
+                        "Saving the money",
+                        "Another purchase",
+                        "Less clutter or mental space",
+                        "Something else"
+                    ]
+                },
+                {
+                    text: "Imagine yourself 30 days from now. What feels most likely?",
+                    type: "options",
+                    options: [
+                        "I'm glad I bought it",
+                        "I feel neutral about it",
+                        "I barely used it",
+                        "I slightly regret it"
+                    ]
+                },
+                {
+                    text: "If this disappeared tomorrow, what would you most likely do?",
+                    type: "options",
+                    options: [
+                        "Buy an alternative",
+                        "Do nothing and move on",
+                        "Revisit it later",
+                        "I'm not sure"
+                    ]
+                }
+            ]
+        };
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function startFlow(category) {
+            currentCategory = category;
+            currentQuestion = 1;
+            showScreen('questions');
+            updateQuestion();
+        }
+
+        function updateQuestion() {
+            const q = questions[currentCategory][currentQuestion - 1];
+            document.getElementById('q-num').textContent = currentQuestion;
+            document.getElementById('q-text').textContent = q.text;
+            document.getElementById('progress').style.width = (currentQuestion / 5 * 100) + '%';
+
+            const answerArea = document.getElementById('answer-area');
+            if (q.type === 'text') {
+                answerArea.innerHTML = `<input type="text" id="text-input" placeholder="${q.placeholder}">`;
+            } else {
+                answerArea.innerHTML = q.options.map(opt =>
+                    `<button class="option-btn" onclick="selectOption(this)">${opt}</button>`
+                ).join('');
+            }
+        }
+
+        function selectOption(btn) {
+            document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < 5) {
+                currentQuestion++;
+                updateQuestion();
+            } else {
+                showScreen('reflection');
+            }
+        }
+
+        function goBack() {
+            showScreen('home');
+        }
+
+        function goHome() {
+            showScreen('home');
+        }
+    </script>
+</body>
+</html>
